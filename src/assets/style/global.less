@@ -1,0 +1,69 @@
+
+* {
+  box-sizing: border-box;
+}
+
+@prefix: f;
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  background-color: var(--color-bg-1);
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+// 文字相关
+.@{prefix}-text-center {
+  text-align: center;
+}
+.@{prefix}-text-right {
+  text-align: right;
+}
+
+// 浮动相关
+.@{prefix}-fl {
+  float: left;
+}
+.@{prefix}-fr {
+  float: right;
+}
+
+// 边距相关
+@sizes: 0, 5, 10, 15, 20;
+each(@sizes,{
+  .@{prefix}-m-@{value} { margin: (@value * 1px) !important}
+  .@{prefix}-mt-@{value} { margin-top: (@value * 1px) !important}
+  .@{prefix}-mr-@{value} { margin-right: (@value * 1px) !important}
+  .@{prefix}-mb-@{value} { margin-bottom: (@value * 1px) !important}
+  .@{prefix}-ml-@{value} { margin-left: (@value * 1px) !important}
+
+  .@{prefix}-p-@{value} { padding: (@value * 1px) !important}
+  .@{prefix}-pt-@{value} { padding-top: (@value * 1px) !important}
+  .@{prefix}-pr-@{value} { padding-right: (@value * 1px) !important}
+  .@{prefix}-pb-@{value} { padding-bottom: (@value * 1px) !important}
+  .@{prefix}-pl-@{value} { padding-left: (@value * 1px) !important}
+})
+//快速使用
+.@{prefix}-m { margin: 20px !important; }
+.@{prefix}-mt { margin-top: 20px !important; }
+.@{prefix}-mr { margin-right: 20px !important; }
+.@{prefix}-mb { margin-bottom: 20px !important; }
+.@{prefix}-ml { margin-left: 20px !important; }
+
+.@{prefix}-p { padding: 20px !important; }
+.@{prefix}-pt { padding-top: 20px !important; }
+.@{prefix}-pr { padding-right: 20px !important; }
+.@{prefix}-pb { padding-bottom: 20px !important; }
+.@{prefix}-pl { padding-left: 20px !important; }
+
+.@{prefix}-cursor-pointer{
+  cursor: pointer;
+}
+.@{prefix}-border-radius{
+  border-radius: 0.75rem;
+}
