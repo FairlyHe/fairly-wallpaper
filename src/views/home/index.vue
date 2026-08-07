@@ -5,9 +5,10 @@ export default {
 </script>
 <script setup>
 import {ref, onMounted} from 'vue'
+import {useStorage} from '@vueuse/core'
 import {API_ALLCATEGORIES_GET} from '@/api/home';
 
-const defaultCurrent = ref(['6'])
+const defaultCurrent = useStorage('fox-wallpaper:defaultCurrent', ['6'])
 const navList = ref([])
 
 // 获取分类列表
@@ -18,8 +19,22 @@ const getAllcategories = async () => {
             a: 'getAllCategories'
         })
         // console.log('获取分类列表', res.data)
-        navList.value = res.data
-        await getAllcategoriesList()
+        navList.value = Array.isArray(Object.values(res.data)) ? Object.values(res.data) : []
+
+        const savedCategory = defaultCurrent.value[0]
+        const activeCategory = navList.value.find(
+            item => String(item.id) === String(savedCategory)
+        )
+        const fallbackCategory = navList.value.find(item => String(item.id) === '6') || navList.value[0]
+
+        if (!activeCategory && fallbackCategory) {
+            defaultCurrent.value = [fallbackCategory.id]
+            current.value = 1
+        } else if (activeCategory) {
+            defaultCurrent.value = [activeCategory.id]
+        }
+
+        await getAllcategoriesList(current.value)
     } catch (error) {
         console.error('获取分类列表失败', error)
         navList.value = []
@@ -30,19 +45,20 @@ const getAllcategories = async () => {
 const loading = ref(false)
 const pageSize = ref(20) // 每页展示的数据条数
 const total = ref(0) // 数据总数
-const current = ref(1) // 当前页数
+const current = useStorage('fox-wallpaper:currentPage', 1) // 当前页数
 
 const wallpaperList = ref([])
 
 async function getAllcategoriesList(page = 1) {
+    const normalizedPage = Math.max(1, Number.parseInt(page, 10) || 1)
     loading.value = true
-    current.value = page
+    current.value = normalizedPage
     try {
         const res = await API_ALLCATEGORIES_GET({
             c: 'WallPaper',
             a: 'getAppsByCategory',
             cid: defaultCurrent.value[0],
-            start: (page - 1) * pageSize.value
+            start: (normalizedPage - 1) * pageSize.value
         })
         // console.log('res', res)
         total.value = Number(res.total)

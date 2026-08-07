@@ -5,13 +5,13 @@
 
 ## Preview
 light
-![light](./doc/light.jpg)
+![light](./doc/light.webp)
 
 dark
-![dark](./doc/dark.jpg)
+![dark](./doc/dark.webp)
 
 Preview
-![preview](./doc/preview.jpg)
+![preview](./doc/preview.webp)
 
 ## Project Setup
 
