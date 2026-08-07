@@ -5,9 +5,10 @@ export default {
 </script>
 <script setup>
 import {ref, onMounted} from 'vue'
-import {useStorage} from '@vueuse/core'
+import {useMediaQuery, useStorage} from '@vueuse/core'
 import {API_ALLCATEGORIES_GET} from '@/api/home';
 
+const isMobile = useMediaQuery('(max-width: 768px)')
 const defaultCurrent = useStorage('fox-wallpaper:defaultCurrent', ['6'])
 const navList = ref([])
 
@@ -126,12 +127,13 @@ onMounted(() => {
 </script>
 
 <template>
-    <div flex style="height: 100%" class="aaa">
-        <div flex-box="0" class="leftNav">
-            <a-scrollbar style="height: 100%; overflow: auto">
-                <div style="height: 100vh;width: 200px;">
+    <div class="home-page">
+        <aside class="category-nav">
+            <a-scrollbar class="category-scroll">
+                <div class="category-menu-shell">
                     <a-menu
-                        mode="vertical"
+                        class="category-menu"
+                        :mode="isMobile ? 'horizontal' : 'vertical'"
                         :style="{ 'text-align': 'center' }"
                         :selected-keys="defaultCurrent"
                         @menu-item-click="handleClick"
@@ -140,15 +142,15 @@ onMounted(() => {
                     </a-menu>
                 </div>
             </a-scrollbar>
-        </div>
-        <div flex-box="1" flex="dir:top">
-            <div flex-box="1" class="aaaaa" style="height: 100%; overflow: auto;">
-                <a-scrollbar style="height: 100%; overflow: auto">
+        </aside>
+        <section class="wallpaper-main">
+            <div class="wallpaper-list">
+                <a-scrollbar class="wallpaper-scroll">
                     <a-spin class="wallpaper-spin" :loading="loading" tip="努力插入中...">
                         <div class="empty-state" flex="main:center cross:center" v-if="wallpaperList.length === 0">
                             <a-result status="404" title="暂时没有壁纸" subtitle="请查看其它分类吧！"></a-result>
                         </div>
-                        <a-grid :cols="{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5  }" :colGap="12" :rowGap="16"
+                        <a-grid :cols="{ xs: 2, sm: 2, md: 3, lg: 4, xl: 5 }" :colGap="12" :rowGap="16"
                                 class="grid-demo-grid" v-else>
                             <a-grid-item class="demo-item" v-for="item in wallpaperList" :key="item.id">
                                 <a-image
@@ -168,67 +170,161 @@ onMounted(() => {
                     </a-spin>
                 </a-scrollbar>
             </div>
-            <div class="f-text-center f-mt-10 f-mb-10" flex-box="0">
-                <div style="display: inline-block">
-                    <a-pagination :total="total" :current="current" :page-size="pageSize" @change="changeAllcategoriesList"/>
+            <div class="pagination-bar">
+                <div>
+                    <a-pagination :total="total" :current="current" :page-size="pageSize"
+                                  :size="isMobile ? 'small' : 'medium'"
+                                  :simple="isMobile"
+                                  @change="changeAllcategoriesList"/>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 
 
     <a-modal
         v-model:visible="imageVisible"
-        width="80vw"
+        class="wallpaper-modal"
+        :width="isMobile ? '94vw' : '80vw'"
         :hide-title="true"
         :hideCancel="true"
         okText="关闭"
         @onOk="imageVisible = false; imageDetails = {}"
     >
-        <a-row class="grid-demo" :gutter="12" flex style="align-items: initial">
-            <a-col :span="18" flex-box="1">
+        <div class="image-detail">
+            <div class="image-preview">
                 <a-image
+                    class="detail-image"
                     width="100%"
                     :src="imageDetails.url"
                     show-loader
                     :preview="false"
                 >
                 </a-image>
-            </a-col>
-            <a-col :span="6" flex-box="0">
-                <div flex="dir:top" style="height: 100%">
-                    <div flex-box="0">
+            </div>
+            <div class="detail-panel">
+                    <div class="detail-section">
                         <p class="f-mb-5">标签：</p>
                         <a-space wrap>
-                            <a-tag v-for="i in (imageDetails.utag || '').split(' ').filter(Boolean)" :key="i"
-                                   :color="'#' + Math.floor(Math.random()*0xffffff).toString(16)">{{ i }}
+                            <a-tag
+                                v-for="i in (imageDetails.utag || '').split(' ').filter(Boolean)"
+                                :key="i">
+                                {{ i }}
                             </a-tag>
                         </a-space>
                     </div>
-                    <div flex-box="1">
+                    <div class="detail-section resolution-section">
                         <p class="f-mb-5">分辨率：</p>
                         <a-space wrap>
-                            <a-tag v-for="r in resolution" :key="r.key" checkable
-                                   :color="'#' + Math.floor(Math.random()*0xffffff).toString(16)"
-                                   @check="handleResolutionClick(r)">{{ r.value }}
+                            <a-tag
+                                v-for="r in resolution"
+                                :key="r.key" checkable
+                                @check="handleResolutionClick(r)">
+                                {{ r.value }}
                             </a-tag>
                         </a-space>
                     </div>
-                    <div flex-box="0" class="f-text-right">
-                        <a-button type="primary" size="small" status="success" :loading="downloadBtnLoading"
-                                  @click="handleDownload(imageDetails)">下载
+                    <div class="download-action">
+                        <a-button
+                            class="download-button"
+                            type="primary"
+                            size="small"
+                            :loading="downloadBtnLoading"
+                            @click="handleDownload(imageDetails)">
+                            下载
                         </a-button>
                     </div>
-                </div>
-            </a-col>
-        </a-row>
+            </div>
+        </div>
     </a-modal>
 </template>
 
 <style scoped lang="less">
-:deep(.arco-scrollbar, .arco-scrollbar-container) {
-    //height: calc(100vh - 60px);
+.home-page {
+    display: flex;
     height: 100%;
+    min-width: 0;
+}
+
+.category-nav {
+    flex: 0 0 200px;
+    width: 200px;
+    min-height: 0;
+    overflow: hidden;
+    border-right: 1px solid var(--color-border-2);
+}
+
+:deep(.category-scroll),
+:deep(.wallpaper-scroll) {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+:deep(.category-nav > .arco-scrollbar) {
+    display: block;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+:deep(.category-scroll) {
+    min-height: 0;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+:deep(.wallpaper-scroll) {
+    min-height: 0;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+.category-menu-shell {
+    width: 200px;
+    min-height: 100%;
+}
+
+.wallpaper-main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+.wallpaper-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+:deep(.wallpaper-list > .arco-scrollbar) {
+    display: block;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.grid-demo-grid {
+    padding: 12px;
+}
+
+.demo-item {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pagination-bar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--color-border-2);
 }
 
 :deep(.wallpaper-spin) {
@@ -253,5 +349,135 @@ onMounted(() => {
     justify-content: center;
     width: 100%;
     min-height: calc(100vh - 150px);
+}
+
+.image-detail {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(220px, 1fr);
+    gap: 20px;
+    align-items: stretch;
+}
+
+.image-preview {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--color-fill-1);
+}
+
+:deep(.detail-image .arco-image-img) {
+    display: block;
+    width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+}
+
+.detail-panel {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.detail-section p {
+    color: var(--color-text-2);
+    font-weight: 600;
+}
+
+.resolution-section {
+    flex: 1 1 auto;
+}
+
+.download-action {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+    .home-page {
+        flex-direction: column;
+    }
+
+    .category-nav {
+        flex: 0 0 48px;
+        width: 100%;
+        height: 48px;
+        overflow: hidden;
+        border-right: 0;
+        border-bottom: 1px solid var(--color-border-2);
+    }
+
+    :deep(.category-scroll) {
+        height: 48px;
+    }
+
+    :deep(.category-scroll) {
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-x: contain;
+    }
+
+    .category-menu-shell {
+        width: max-content;
+        min-width: 100%;
+        min-height: 48px;
+    }
+
+    :deep(.category-menu) {
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .grid-demo-grid {
+        padding: 8px;
+    }
+
+    .pagination-bar {
+        min-height: 44px;
+        padding: 6px 8px;
+    }
+
+    .empty-state {
+        min-height: calc(100vh - 210px);
+    }
+
+    .image-detail {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .image-preview {
+        max-height: 44vh;
+    }
+
+    :deep(.detail-image .arco-image-img) {
+        max-height: 44vh;
+    }
+
+    .detail-panel {
+        max-height: 34vh;
+        overflow-y: auto;
+    }
+
+    .download-action {
+        position: sticky;
+        bottom: 0;
+        margin-top: 20px;
+        padding-top: 12px;
+        background: var(--color-bg-3);
+    }
+
+    .download-button {
+        width: 100%;
+    }
+
+    .wallpaper-modal :deep(.arco-modal-body) {
+        max-height: 78vh;
+        padding: 12px;
+        overflow-y: auto;
+    }
 }
 </style>
