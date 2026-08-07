@@ -8,7 +8,6 @@ export function SYS_USER_LOGIN(data) {
     });
 }
 
-
 export function API_BANNER_GET(params) {
     return request({
         url: '/banner',
@@ -25,7 +24,7 @@ export function API_PERSONALIZED_GET(params) {
 }
 export function API_ALLCATEGORIES_GET(params) {
     return request({
-        url: '/index.php',
+        url: '/api/wallpaper',
         method: 'get',
         params,
     });

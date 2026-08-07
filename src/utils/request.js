@@ -1,6 +1,4 @@
 import axios from 'axios';
-import QS from 'qs';
-import { Message, Modal } from '@arco-design/web-vue';
 import util from "@/utils/util.js";
 
 
@@ -13,11 +11,13 @@ const service = axios.create({
 // 请求拦截
 service.interceptors.request.use(
     async config => {
-        config.headers.token = util.cookies.get('token')
+        config.headers = config.headers || {}
+        const token = util.cookies.get('token')
+        if (token) config.headers.token = token
         return config
     },
     error => {
-        return Promise.error(error)
+        return Promise.reject(error)
     }
 );
 // 响应拦截
@@ -30,7 +30,7 @@ service.interceptors.response.use(
         }
     },
     error => {
-        if (error.response.status) {
+        if (error.response?.status) {
             switch (error.response.status) {
                 // 401: 未登录
                 // 未登录则跳转登录页面，并携带当前页面的路径
@@ -53,6 +53,7 @@ service.interceptors.response.use(
             }
             return Promise.reject(error.response);
         }
+        return Promise.reject(error);
     }
 );
 

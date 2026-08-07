@@ -23,7 +23,7 @@ const frameIn = [
         component: layout,
         children: [
             {
-                path: 'index',
+                path: '/',
                 name: 'index',
                 meta: {
                     title: '首页',
