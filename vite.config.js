@@ -29,10 +29,9 @@ export default defineConfig({
     server: {
         // port: 3333,
         proxy: {
-            "/api/wallpaper": {
+            "/index.php": {
                 target: "http://cdn.apc.360.cn/",
                 changeOrigin: true,
-                rewrite: () => "/index.php"
             }
         }
     }

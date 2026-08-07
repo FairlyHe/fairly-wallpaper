@@ -39,11 +39,12 @@ async function getAllcategoriesList(page = 1) {
     current.value = page
     try {
         const res = await API_ALLCATEGORIES_GET({
-        c: 'WallPaper',
-        a: 'getAppsByCategory',
-        cid: defaultCurrent.value[0],
-        start: (page - 1) * pageSize.value
+            c: 'WallPaper',
+            a: 'getAppsByCategory',
+            cid: defaultCurrent.value[0],
+            start: (page - 1) * pageSize.value
         })
+        // console.log('res', res)
         total.value = Number(res.total)
         wallpaperList.value = Array.isArray(res.data) ? res.data : []
     } catch (error) {
@@ -127,13 +128,13 @@ onMounted(() => {
         <div flex-box="1" flex="dir:top">
             <div flex-box="1" class="aaaaa" style="height: 100%; overflow: auto;">
                 <a-scrollbar style="height: 100%; overflow: auto">
-                    <a-spin :loading="loading" tip="努力插入中...">
-                        <div flex="main:center cross:center" style="height: 100%" v-if="wallpaperList.length === 0">
+                    <a-spin class="wallpaper-spin" :loading="loading" tip="努力插入中...">
+                        <div class="empty-state" flex="main:center cross:center" v-if="wallpaperList.length === 0">
                             <a-result status="404" title="暂时没有壁纸" subtitle="请查看其它分类吧！"></a-result>
                         </div>
                         <a-grid :cols="{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5  }" :colGap="12" :rowGap="16"
                                 class="grid-demo-grid" v-else>
-                            <a-grid-item class="demo-item" v-for="item in wallpaperList" :key="item.utag || item.url">
+                            <a-grid-item class="demo-item" v-for="item in wallpaperList" :key="item.id">
                                 <a-image
                                     width="100%"
                                     height="100%"
@@ -214,6 +215,11 @@ onMounted(() => {
     height: 100%;
 }
 
+:deep(.wallpaper-spin) {
+    display: block;
+    width: 100%;
+}
+
 .loader-animate {
     width: 100%;
     height: 100%;
@@ -223,5 +229,13 @@ onMounted(() => {
     var(--color-fill-3) 55%);
     background-size: 400% 100%;
     animation: loop-circle 1.5s cubic-bezier(0.34, 0.69, 0.1, 1) infinite;
+}
+
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: calc(100vh - 150px);
 }
 </style>

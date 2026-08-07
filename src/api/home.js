@@ -24,7 +24,9 @@ export function API_PERSONALIZED_GET(params) {
 }
 export function API_ALLCATEGORIES_GET(params) {
     return request({
-        url: '/api/wallpaper',
+        // Vite's local proxy keeps the original endpoint; Vercel uses the
+        // serverless function so the upstream URL is never exposed publicly.
+        url: import.meta.env.DEV ? '/index.php' : '/api/wallpaper',
         method: 'get',
         params,
     });
