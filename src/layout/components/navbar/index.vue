@@ -70,13 +70,24 @@ function handleToggleTheme() {
 
 <template>
   <div flex="main:justify cross:center" class="" :class="device.mobile() ? '' : 'navbar'">
-    <div flex-box="0" class="navigation-buttons navbarpadding" v-if="!device.mobile()">
-      <a-button type="text">Fairly Wallpaper</a-button>
+    <div flex-box="0" class="navigation-buttons navbarpadding">
+      <a-button type="text" class="brand-button" @click="toUrl('/')">
+        <img class="brand-logo" src="/fox-logo.png" alt="">
+        <span class="brand-full">狐狸壁纸</span>
+        <span class="brand-short">狐狸</span>
+      </a-button>
     </div>
 
-    <div flex-box="0" flex="main:center cross:center" class="right-part navbarpadding" v-if="!device.mobile()">
+    <div flex-box="0" flex="main:center cross:center" class="right-part navbarpadding">
       <div>
         <a-space>
+          <a-tooltip content="项目说明">
+            <a-button shape="circle" aria-label="项目说明" @click="toUrl('/about')">
+              <template #icon>
+                <icon-info-circle />
+              </template>
+            </a-button>
+          </a-tooltip>
           <a-tooltip :content="theme === 'light' ? '点击切换为暗黑模式' : '点击切换为亮色模式'">
             <a-button
                 class=""
@@ -103,6 +114,22 @@ function handleToggleTheme() {
   padding: 14px 20px;
 }
 
+.brand-short {
+  display: none;
+}
+
+.brand-button {
+  color: var(--color-text-1);
+  font-weight: 600;
+}
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
+  object-fit: contain;
+}
+
 .navigation-buttons, .right-part {
   .arco-icon {
     color: initial;
@@ -117,6 +144,21 @@ function handleToggleTheme() {
   }
   :deep(.arco-menu-selected-label) {
     display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .navbarpadding {
+    padding: 10px 12px;
+  }
+
+  .brand-full {
+    display: none;
+  }
+
+  .brand-short {
+    display: inline;
+    font-weight: 700;
   }
 }
 </style>

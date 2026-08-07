@@ -31,6 +31,15 @@ const frameIn = [
                 },
                 component: () => import('@/views/home/index.vue')
             },
+            {
+                path: 'about',
+                name: 'about',
+                meta: {
+                    title: '项目说明',
+                    auth: false
+                },
+                component: () => import('@/views/about/index.vue')
+            },
         ]
     },
     // ...result
